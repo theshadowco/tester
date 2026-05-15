@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdclass:CommonModule xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="30bd3a7c-c26f-4f42-b6ca-a33eb36a18b6">
+  <name>MCPServerSrv</name>
+  <server>true</server>
+  <serverCall>true</serverCall>
+</mdclass:CommonModule>

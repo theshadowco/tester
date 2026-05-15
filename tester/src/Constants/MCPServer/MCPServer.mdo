@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdclass:Constant xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:core="http://g5.1c.ru/v8/dt/mcore" xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="fea579aa-a11f-4f7e-a7f3-e75e928de34e">
+  <producedTypes>
+    <managerType typeId="f6a7a7ce-14d2-4750-ad0c-e0d60e5c8e82" valueTypeId="03b19995-bb9a-424e-a99b-a45d7500fde4"/>
+    <valueManagerType typeId="041d3d7f-cc04-4a4e-b969-318814177c39" valueTypeId="5549409c-875a-4568-b4b2-6465a005251d"/>
+    <valueKeyType typeId="f655bbf6-1725-459b-be60-b38076823b2a" valueTypeId="c0f92341-eaa5-4c91-bcd2-c6a8935880fe"/>
+  </producedTypes>
+  <name>MCPServer</name>
+  <synonym>
+    <key>en</key>
+    <value>MCP Server</value>
+  </synonym>
+  <synonym>
+    <key>ru</key>
+    <value>MCP Сервер</value>
+  </synonym>
+  <type>
+    <types>String</types>
+    <stringQualifiers/>
+  </type>
+  <explanation>
+    <key>en</key>
+    <value>Tester's MCP Server. For example: localhost:8080. Restart the application to apply the new value</value>
+  </explanation>
+  <explanation>
+    <key>ru</key>
+    <value>MCP-сервер Тестера. Например: localhost:8080. Перезапустите приложение, чтобы применить новое значение</value>
+  </explanation>
+  <toolTip>
+    <key>en</key>
+    <value>Tester's MCP Server. For example: localhost:8080. Restart the application to apply the new value</value>
+  </toolTip>
+  <toolTip>
+    <key>ru</key>
+    <value>MCP-сервер Тестера. Например: localhost:8080. Перезапустите приложение, чтобы применить новое значение</value>
+  </toolTip>
+  <minValue xsi:type="core:UndefinedValue"/>
+  <maxValue xsi:type="core:UndefinedValue"/>
+  <dataLockControlMode>Managed</dataLockControlMode>
+</mdclass:Constant>

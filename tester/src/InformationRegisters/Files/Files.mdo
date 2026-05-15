@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdclass:InformationRegister xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:core="http://g5.1c.ru/v8/dt/mcore" xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="53c6238c-82b0-4c67-ba92-90050324cb1d">
+  <producedTypes>
+    <selectionType typeId="4fc1765f-3e36-4d72-ab3d-127003cb917e" valueTypeId="b803dc0c-4d0d-4260-84be-e3e4b4419a97"/>
+    <listType typeId="f9cfd801-bca3-436a-8a63-c914b079477e" valueTypeId="74efd6c2-60d8-411c-af03-5ed09ba6583c"/>
+    <managerType typeId="f72988a4-95e2-475f-93d2-c060342d26c1" valueTypeId="22cd5c8b-3a8d-4243-8220-6e8a9b928976"/>
+    <recordSetType typeId="8be5334b-0505-4ed4-bcfc-6ecf5141257c" valueTypeId="e454d3cf-f541-4939-a444-85e9b23edab1"/>
+    <recordKeyType typeId="3961f4e1-bdfd-4413-8002-d6ee02595c0f" valueTypeId="e8b3de7a-88ab-4c6f-8206-2c98f2bbda44"/>
+    <recordType typeId="2bdb590e-ae4b-4853-ba39-cf561da694a7" valueTypeId="61bcbb6a-cc08-4b10-a402-c911b1388e13"/>
+    <recordManagerType typeId="df5e66d7-393b-428e-838f-6962c9de27fe" valueTypeId="f0e07961-fc07-4293-9374-a3049b1ff61f"/>
+  </producedTypes>
+  <name>Files</name>
+  <synonym>
+    <key>en</key>
+    <value>Files</value>
+  </synonym>
+  <useStandardCommands>true</useStandardCommands>
+  <editType>InDialog</editType>
+  <dataLockControlMode>Managed</dataLockControlMode>
+  <resources uuid="f732eeb6-70c3-49f6-bc57-4825d7408b9b">
+    <name>Application</name>
+    <synonym>
+      <key>en</key>
+      <value>Application</value>
+    </synonym>
+    <synonym>
+      <key>ru</key>
+      <value>Приложение</value>
+    </synonym>
+    <type>
+      <types>CatalogRef.Applications</types>
+    </type>
+    <toolTip>
+      <key>en</key>
+      <value>Application</value>
+    </toolTip>
+    <toolTip>
+      <key>ru</key>
+      <value>Приложение</value>
+    </toolTip>
+    <minValue xsi:type="core:UndefinedValue"/>
+    <maxValue xsi:type="core:UndefinedValue"/>
+    <fullTextSearch>Use</fullTextSearch>
+    <dataHistory>Use</dataHistory>
+    <fillFromFillingValue>true</fillFromFillingValue>
+    <fillValue xsi:type="core:UndefinedValue"/>
+    <indexing>Index</indexing>
+  </resources>
+  <resources uuid="fe9e6bea-b9d8-4cec-8780-482e6865fa58">
+    <name>Content</name>
+    <synonym>
+      <key>en</key>
+      <value>Content</value>
+    </synonym>
+    <type>
+      <types>Number</types>
+      <numberQualifiers>
+        <precision>20</precision>
+      </numberQualifiers>
+    </type>
+    <minValue xsi:type="core:UndefinedValue"/>
+    <maxValue xsi:type="core:UndefinedValue"/>
+    <fullTextSearch>Use</fullTextSearch>
+    <dataHistory>Use</dataHistory>
+    <fillValue xsi:type="core:UndefinedValue"/>
+  </resources>
+  <resources uuid="abe026af-25c0-4def-9fca-e527bd939649">
+    <name>File</name>
+    <synonym>
+      <key>en</key>
+      <value>File</value>
+    </synonym>
+    <type>
+      <types>String</types>
+      <stringQualifiers/>
+    </type>
+    <minValue xsi:type="core:UndefinedValue"/>
+    <maxValue xsi:type="core:UndefinedValue"/>
+    <fullTextSearch>Use</fullTextSearch>
+    <dataHistory>Use</dataHistory>
+    <fillValue xsi:type="core:StringValue"/>
+  </resources>
+  <dimensions uuid="2c997339-dca6-452f-9f42-56642347caca">
+    <name>Session</name>
+    <synonym>
+      <key>en</key>
+      <value>Session</value>
+    </synonym>
+    <synonym>
+      <key>ru</key>
+      <value>Сеанс</value>
+    </synonym>
+    <type>
+      <types>CatalogRef.Sessions</types>
+    </type>
+    <toolTip>
+      <key>en</key>
+      <value>Session</value>
+    </toolTip>
+    <toolTip>
+      <key>ru</key>
+      <value>Сеанс</value>
+    </toolTip>
+    <minValue xsi:type="core:UndefinedValue"/>
+    <maxValue xsi:type="core:UndefinedValue"/>
+    <fullTextSearch>Use</fullTextSearch>
+    <dataHistory>Use</dataHistory>
+    <fillFromFillingValue>true</fillFromFillingValue>
+    <fillValue xsi:type="core:UndefinedValue"/>
+    <master>true</master>
+    <mainFilter>true</mainFilter>
+  </dimensions>
+  <dimensions uuid="afcae549-f2ea-4e53-8722-968ab81db896">
+    <name>ID</name>
+    <synonym>
+      <key>en</key>
+      <value>ID</value>
+    </synonym>
+    <type>
+      <types>Number</types>
+      <numberQualifiers>
+        <precision>20</precision>
+      </numberQualifiers>
+    </type>
+    <minValue xsi:type="core:UndefinedValue"/>
+    <maxValue xsi:type="core:UndefinedValue"/>
+    <fullTextSearch>Use</fullTextSearch>
+    <dataHistory>Use</dataHistory>
+    <fillValue xsi:type="core:UndefinedValue"/>
+    <mainFilter>true</mainFilter>
+  </dimensions>
+</mdclass:InformationRegister>

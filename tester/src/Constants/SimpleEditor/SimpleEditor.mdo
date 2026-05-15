@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdclass:Constant xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:core="http://g5.1c.ru/v8/dt/mcore" xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="caf74a34-1c25-4a27-871d-cf8a6e6c9295">
+  <producedTypes>
+    <managerType typeId="a4464609-e896-4fa7-8381-a6af01ebcffc" valueTypeId="eca5f6b3-c9a5-4a51-b30f-8724455e3ed6"/>
+    <valueManagerType typeId="3dba0e5c-81cd-400d-9cd9-f4e253cae0a0" valueTypeId="fc6aac0d-9266-41af-a776-c553a4e8e922"/>
+    <valueKeyType typeId="bcf4f825-1655-4af1-b189-95c9bda49171" valueTypeId="8db5a9fe-8249-48e8-9412-ca54b29cb508"/>
+  </producedTypes>
+  <name>SimpleEditor</name>
+  <synonym>
+    <key>en</key>
+    <value>Simple Editor</value>
+  </synonym>
+  <synonym>
+    <key>ru</key>
+    <value>Простой редактор</value>
+  </synonym>
+  <type>
+    <types>Boolean</types>
+  </type>
+  <explanation>
+    <key>en</key>
+    <value>Simple text editor, no syntax highlighting. Enable this mode if the advanced module text editor is not stable in your environment</value>
+  </explanation>
+  <explanation>
+    <key>ru</key>
+    <value>Простой текстовый редактор, без синтаксической подсветки. Включите этот режим, если расширенный текстовый редактор модулей работает не стабильно в вашем окружении</value>
+  </explanation>
+  <toolTip>
+    <key>en</key>
+    <value>Simple text editor, no syntax highlighting. Enable this mode if the advanced module text editor is not stable in your environment</value>
+  </toolTip>
+  <toolTip>
+    <key>ru</key>
+    <value>Простой текстовый редактор, без синтаксической подсветки. Включите этот режим, если расширенный текстовый редактор модулей работает не стабильно в вашем окружении</value>
+  </toolTip>
+  <minValue xsi:type="core:UndefinedValue"/>
+  <maxValue xsi:type="core:UndefinedValue"/>
+  <dataLockControlMode>Managed</dataLockControlMode>
+</mdclass:Constant>

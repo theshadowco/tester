@@ -1,0 +1,50 @@
+cmake_minimum_required ( VERSION 3.13 )
+project ( tester )
+set ( CMAKE_CXX_STANDARD 20 )
+set ( CMAKE_CXX_STANDARD_REQUIRED ON )
+option ( WITH_TESTS "Build the project with tests" ON )
+add_definitions ( -DUNICODE )
+find_package ( utf8cpp CONFIG REQUIRED )
+find_package ( xxHash CONFIG REQUIRED )
+find_package ( nlohmann_json CONFIG REQUIRED )
+find_package ( pugixml CONFIG REQUIRED )
+find_package ( httplib CONFIG REQUIRED )
+if ( WIN32 )
+    add_definitions ( -D_WIN32_WINNT=0x0A00 -DWIN32_LEAN_AND_MEAN -DNOMINMAX /MT )
+elseif ( UNIX )
+    find_package ( X11 REQUIRED )
+    find_package ( PNG REQUIRED )
+    include_directories ( ${X11_INCLUDE_DIR} ${PNG_INCLUDE_DIRS} )
+endif ()
+file ( GLOB sources *.h *.cpp *.def 1c/*.h 1c/*.cpp )
+add_library ( ${PROJECT_NAME} SHARED ${sources} )
+if ( UNIX )
+    target_link_options ( ${PROJECT_NAME} PUBLIC -static-libstdc++ )
+endif ()
+target_link_libraries ( ${PROJECT_NAME}
+  ${X11_LIBRARIES}
+  ${PNG_LIBRARIES}
+  utf8::cpp
+  utf8cpp::utf8cpp
+  xxHash::xxhash
+  nlohmann_json nlohmann_json::nlohmann_json
+  pugixml::static pugixml::pugixml
+  httplib::httplib
+)
+if ( WITH_TESTS )
+    include ( CTest )
+    if ( BUILD_TESTING )
+      find_package ( doctest CONFIG REQUIRED )
+      add_executable ( test_tester tests/watcher.cpp tests/core.cpp)
+      target_include_directories ( test_tester PRIVATE ${PROJECT_SOURCE_DIR} )
+      target_link_libraries ( test_tester PRIVATE ${PROJECT_NAME} doctest::doctest )
+      add_test ( NAME test_tester COMMAND test_tester )
+      add_executable ( test_mcp_runner tests/mcp_runner.cpp )
+      target_include_directories ( test_mcp_runner PRIVATE ${PROJECT_SOURCE_DIR} )
+      target_compile_definitions ( test_mcp_runner PRIVATE TESTER_SOURCE_DIR="${PROJECT_SOURCE_DIR}" )
+      target_link_libraries ( test_mcp_runner PRIVATE doctest::doctest nlohmann_json::nlohmann_json httplib::httplib )
+      add_dependencies ( test_mcp_runner ${PROJECT_NAME} )
+      add_test ( NAME test_mcp_runner COMMAND test_mcp_runner )
+      set_tests_properties ( test_mcp_runner PROPERTIES LABELS integration TIMEOUT 140 )
+    endif ()
+endif ()

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdclass:CommonModule xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="d561de7c-5069-4511-95b6-c586a49a1444">
+  <name>SystemEnvironment</name>
+  <server>true</server>
+  <privileged>true</privileged>
+  <returnValuesReuse>DuringSession</returnValuesReuse>
+</mdclass:CommonModule>

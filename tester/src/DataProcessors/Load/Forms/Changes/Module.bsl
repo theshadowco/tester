@@ -1,0 +1,722 @@
+#if ( Server or ThinClient or ThickClientManagedApplication ) then
+
+&AtServer
+var Tree;
+&AtServer
+var CurrentApplication;
+&AtServer
+var CurrentData;
+&AtClient
+var ScenarioIndex;
+&AtClient
+var LastScenario;
+&AtServer
+var CommonApplication;
+&AtClient
+var ScenariosSet;
+&AtClient
+var CurrentData;
+&AtClient
+var FilesContent;
+&AtClient
+var FilesList;
+&AtClient
+var CurrentFile;
+&AtClient
+var FileIndex;
+&AtClient
+var LastFile;
+&AtClient
+var RenewList;
+&AtServer
+var CommonRows;
+
+// *****************************************
+// *********** Form events
+
+&AtServer
+Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+	
+	loadScenarios ();
+	
+EndProcedure
+
+&AtServer
+Procedure loadScenarios ()
+	
+	createTree ();
+	q = getQuery ();
+	for each CurrentApplication in getApplications () do
+		q.SetParameter ( "Application", CurrentApplication );
+		selection = q.Execute ().Select ( QueryResultIteration.ByGroupsWithHierarchy, "Scenario" );
+		loadSelection ( selection, newApplication () );
+	enddo; 
+	loadChanges ();
+	formatTree ( Tree.Rows );
+	ValueToFormAttribute ( Tree, "ChangesTree" );
+	
+EndProcedure 
+
+&AtServer
+Procedure createTree ()
+	
+	Tree = new ValueTree ();
+	columns = Tree.Columns;
+	boolean = new TypeDescription ( "Boolean" );
+	string = new TypeDescription ( "String" );
+	number = new TypeDescription ( "Number" );
+	datetime = new TypeDescription ( "Date" );
+	columns.Add ( "Presentation", string );
+	columns.Add ( "Application", new TypeDescription ( "CatalogRef.Applications" ) );
+	columns.Add ( "Use", boolean );
+	columns.Add ( "Scenario", new TypeDescription ( "CatalogRef.Scenarios" ) );
+	columns.Add ( "Path", string );
+	columns.Add ( "New", boolean );
+	columns.Add ( "File", string );
+	columns.Add ( "Locked", number );
+	columns.Add ( "Type", new TypeDescription ( "EnumRef.Scenarios" ) );
+	columns.Add ( "Picture", number );
+	columns.Add ( "Sorting", number );
+	columns.Add ( "Found", boolean );
+	columns.Add ( "Changed", datetime );
+	columns.Add ( "Usage", boolean );
+	columns.Add ( "UTC", datetime );
+	columns.Add ( "Extensions", string );
+	
+EndProcedure 
+
+&AtServer
+Function getApplications ()
+	
+	list = new Array ();
+	for each row in Parameters.Changes do
+		list.Add ( row.Application );
+	enddo; 
+	return list;
+	
+EndFunction 
+
+&AtServer
+Function getQuery ()
+	
+	s = "
+	|select allowed Scenarios.Ref as Scenario, Scenarios.Application as Application, Scenarios.Path as Path,
+	|	Scenarios.Type as Type, Scenarios.Changed as Changed, Scenarios.Sorting as Sorting,
+	|	case when Editing.Scenario is null then 0
+	|		when Editing.User = &User then 1
+	|		else 2
+	|	end as Locked,
+	|	case when Scenarios.Spreadsheet then 4 else 0 end
+	|	+
+	|	case when Scenarios.Type = value ( Enum.Scenarios.Library ) then 0
+	|		when Scenarios.Type = value ( Enum.Scenarios.Folder ) then 1
+	|		when Scenarios.Type = value ( Enum.Scenarios.Method ) then 2
+	|		else 3
+	|	end as Picture
+	|from Catalog.Scenarios as Scenarios
+	|	//
+	|	// Editing
+	|	//
+	|	left join InformationRegister.Editing as Editing
+	|	on Editing.Scenario = Scenarios.Ref
+	|where Scenarios.Application = &Application
+	|and not Scenarios.DeletionMark
+	|order by Application, Tree desc, Sorting, Path
+	|totals by Scenario hierarchy
+	|";
+	q = new Query ( s );
+	q.SetParameter ( "User", SessionParameters.User );
+	return q;
+	
+EndFunction
+
+&AtServer
+Function newApplication ()
+	
+	row = Tree.Rows.Add ();
+	row.Application = CurrentApplication;
+	row.Presentation = "" + ? ( CurrentApplication.IsEmpty (), Output.CommonApplicationName (), CurrentApplication );
+	return row.Rows;
+
+EndFunction 
+
+&AtServer
+Procedure loadSelection ( Selection, Destination, LastScenario = undefined )
+	
+	detail = QueryRecordType.DetailRecord;
+	bygroup = QueryRecordType.GroupTotal;
+	hierarchy = QueryRecordType.TotalByHierarchy;
+	deep = QueryResultIteration.ByGroupsWithHierarchy;
+	while ( Selection.Next () ) do
+		scenario = Selection.Scenario;
+		type = Selection.RecordType ();
+		if ( type = detail ) then
+			if ( scenario = LastScenario ) then
+				FillPropertyValues ( Destination.Parent, Selection );
+			endif;
+		else
+			if ( scenario = LastScenario ) then
+				rows = Destination;
+			else
+				row = Destination.Add ();
+				FillPropertyValues ( row, Selection );
+				rows = row.Rows;
+			endif;
+			if ( type = hierarchy ) then
+				next = Selection.Select ( deep, "Scenario" );
+			elsif ( type = bygroup ) then
+				next = Selection.Select ();
+			endif; 
+			loadSelection ( next, rows, Selection.Scenario );
+		endif;
+	enddo; 
+	
+EndProcedure
+
+&AtServer
+Procedure loadChanges ()
+	
+	defineCommon ();
+	for each repository in Parameters.Changes do
+		CurrentApplication = repository.Application;
+		for each CurrentData in repository.Changes do
+			addScenario ();
+		enddo; 
+	enddo; 
+	
+EndProcedure 
+
+&AtServer
+Procedure defineCommon ()
+	
+	CommonApplication = Catalogs.Applications.EmptyRef ();
+	row = Tree.Rows.Find ( CommonApplication, "Application" );
+	CommonRows = ? ( row = undefined, undefined, row.Rows );
+	
+EndProcedure 
+
+&AtServer
+Procedure addScenario ()
+	
+	path = CurrentData.Path;
+	row = findScenario ( path );
+	if ( row = undefined ) then
+		row = newRow ( defineParent (), path );
+	else
+		row.Found = not row.New;
+	endif; 
+	row.UTC = Max ( CurrentData.UTC, row.UTC );
+	row.File = CurrentData.File;
+	ext = CurrentData.Extension;
+	if ( ext <> "" ) then
+		row.Extensions = row.Extensions + ext + ";";
+	endif; 
+	
+EndProcedure 
+
+&AtServer
+Function findScenario ( Path )
+	
+	found = Tree.Rows.FindRows ( new Structure ( "Application, Path", CurrentApplication, Path ), true );
+	if ( found.Count () = 0 ) then
+		rows = findRoot ();
+		found = rows.FindRows ( new Structure ( "Application, Path", CommonApplication, Path ), true );
+	endif;
+	return ? ( found.Count () = 0, undefined, found [ 0 ] );
+	
+EndFunction 
+
+&AtServer
+Function findRoot ()
+	
+	row = Tree.Rows.Find ( CurrentApplication, "Application" );
+	return ? ( row = undefined, undefined, row.Rows );
+	
+EndFunction 
+
+&AtServer
+Function newRow ( Rows, Path )
+	
+	row = Rows.Add ();
+	if ( CommonRows = undefined ) then
+		commonRow = undefined;
+	else
+		commonRow = CommonRows.Find ( Path, "Path", true );
+	endif; 
+	if ( commonRow = undefined ) then
+		row.Path = Path;
+		row.New = true;
+		row.Application = CurrentApplication;
+	else
+		FillPropertyValues ( row, commonRow );
+	endif; 
+	return row;
+	
+EndFunction 
+
+&AtServer
+Function defineParent ()
+	
+	parts = StrSplit ( CurrentData.Path, "." );
+	parts.Delete ( parts.UBound () );
+	path = "";
+	parent = findRoot ();
+	for each part in parts do
+		path = path + part;
+		row = findScenario ( path );
+		if ( row = undefined ) then
+			row = newRow ( parent, path );
+		endif; 
+		parent = row.Rows;
+		path = path + ".";
+	enddo; 
+	return parent;
+	
+EndFunction 
+
+&AtServer
+Procedure formatTree ( Rows )
+	
+	for each row in Rows do
+		setType ( row );
+		setPicture ( row );
+		setUsage ( row );
+		setPresentation ( row );
+		next = row.Rows;
+		if ( next.Count () > 0 ) then
+			formatTree ( next );
+		endif; 
+	enddo; 
+	
+EndProcedure 
+
+&AtServer
+Procedure setType ( Row )
+	
+	if ( not Row.New ) then
+		return;
+	endif; 
+	folder = StrEndsWith ( Row.File, RepositoryFiles.FolderSuffix () );
+	type = ? ( folder, Enums.Scenarios.Folder, Enums.Scenarios.Scenario );
+	Row.Type = type;
+		
+EndProcedure 
+
+&AtServer
+Procedure setPicture ( Row )
+	
+	if ( not Row.New ) then
+		return;
+	endif; 
+	type = Row.Type;
+	if ( type = Enums.Scenarios.Library ) then
+		picture = 0;
+	elsif ( type = Enums.Scenarios.Folder ) then
+		picture = 1;
+	elsif ( type = Enums.Scenarios.Method ) then
+		picture = 2;
+	else
+		picture = 3;
+	endif;
+	if ( StrFind ( Row.Extensions, RepositoryFiles.MXLFile () + ";" ) > 0 ) then
+		picture = 4 + picture;
+	endif;
+	Row.Picture = picture;
+		
+EndProcedure 
+
+&AtServer
+Procedure setUsage ( Row )
+	
+	usage = Row.Path <> ""
+	and ( Row.Extensions <> "" and ( Row.New or Row.Locked = 1 )
+		or ( not Row.Found and Row.Application = CurrentApplication )
+	);
+	Row.Usage = usage;
+	if ( Row.Found ) then
+		Row.Use = usage and ( Row.Changed < Row.UTC );
+	else
+		Row.Use = usage;
+	endif; 
+		
+EndProcedure 
+
+&AtServer
+Procedure setPresentation ( Row )
+	
+	if ( Row.Presentation = "" ) then
+		Row.Presentation = Row.Path;
+	endif; 
+		
+EndProcedure 
+
+&AtClient
+Procedure OnOpen ( Cancel )
+
+	if ( Parameters.Silent ) then
+		Cancel = true;
+		runLoading ();
+	endif;
+
+EndProcedure
+
+// *****************************************
+// *********** Group Form
+
+&AtClient
+Procedure Load ( Command )
+	
+	runLoading ();
+
+EndProcedure
+
+&AtClient
+Procedure runLoading ()
+
+	prepareScenarios ();
+	prepareCounters ();
+	initProgress ();
+	startLoading ();
+	
+EndProcedure
+
+&AtClient
+Procedure prepareScenarios ()
+	
+	ScenariosSet = new Array ();
+	fillScenarios ( ChangesTree.GetItems () );
+	
+EndProcedure 
+
+&AtClient
+Procedure fillScenarios ( Rows )
+	
+	for each row in Rows do
+		if ( row.Use ) then
+			ScenariosSet.Add ( row );
+		endif;
+		next = row.GetItems ();
+		if ( next.Count () > 0 ) then
+			fillScenarios ( next );
+		endif; 
+	enddo; 
+	
+EndProcedure 
+
+&AtClient
+Procedure prepareCounters ()
+	
+	ScenarioIndex = -1;
+	LastScenario = ScenariosSet.UBound ();
+	RenewList = new Array ();
+	
+EndProcedure 
+
+&AtClient
+Procedure initProgress ()
+	
+	ProgressBar = 0;
+	Items.ProgressBar.MaxValue = 1 + LastScenario;
+	Items.ProgressBar.ShowPercent = true;
+	
+EndProcedure 
+
+&AtClient
+Procedure startLoading ()
+	
+	ScenarioIndex = ScenarioIndex + 1;
+	ProgressBar = ProgressBar + 1;
+	RefreshDataRepresentation ( Items.ProgressBar );
+	if ( ScenarioIndex > LastScenario ) then
+		if ( Parameters.Silent ) then
+			broadcastChanges ();
+			if ( RepositoryFilesSynchingCallback <> undefined ) then
+				RunCallback ( RepositoryFilesSynchingCallback );
+				RepositoryFilesSynchingCallback = undefined;
+			endif;
+		else
+			showInfo ();
+		endif;
+		return;
+	endif; 
+	CurrentData = ScenariosSet [ ScenarioIndex ];
+	FilesContent = new Map ();
+	FilesList = filesList ();
+	FileIndex = -1;
+	LastFile = FilesList.UBound ();
+	loadFiles ();
+	
+EndProcedure 
+
+&AtClient
+Function filesList ()
+	
+	list = new Array ();
+	for each ext in StrSplit ( CurrentData.Extensions, ";", false ) do
+		list.Add ( new Structure ( "Name, Extension", CurrentData.File, ext ) );
+	enddo; 
+	return list;
+	
+EndFunction 
+
+&AtClient
+Procedure loadFiles ()
+	
+	FileIndex = FileIndex + 1;
+	if ( FileIndex > LastFile ) then
+		remove = not CurrentData.Found and not CurrentData.New;
+		application = CurrentData.Application;
+		if ( CurrentData.Extensions = "" ) then
+			isCommon = application.IsEmpty () or not remove;
+		else
+			isCommon = false;
+		endif;
+		parent = CurrentData.GetParent ().Scenario;
+		CurrentData.Scenario = updateScenario ( application, isCommon, parent, CurrentData.Path, FilesContent,
+			CurrentData.Type, remove, CurrentData.UTC, CurrentData.File );
+		RenewList.Add ( CurrentData.Scenario );
+		startLoading ();
+		return;
+	endif; 
+	CurrentFile = FilesList [ FileIndex ];
+	file = CurrentFile.Name + CurrentFile.Extension;
+	if ( CurrentFile.Extension = RepositoryFiles.MXLFile () ) then
+		BeginPutFile ( new NotifyDescription ( "PutMXL", ThisObject ), , file, false, UUID );
+	else
+		doc = new TextDocument ();
+		doc.BeginReading ( new NotifyDescription ( "ReadingComplete", ThisObject, doc ), file );
+	endif; 
+	
+EndProcedure 
+
+&AtClient
+Procedure PutMXL ( Result, Address, File, Params ) export
+	
+	if ( Result ) then
+		FilesContent [ CurrentFile.Extension ] = Address;
+	endif; 
+	loadFiles ();
+	
+EndProcedure 
+
+&AtClient
+Procedure broadcastChanges ()
+
+	Notify ( Enum.MessageReload (), RenewList );
+	NotifyChanged ( Type ( "CatalogRef.Scenarios" ) );
+
+EndProcedure
+
+&AtClient
+Procedure showInfo ()
+	
+	Output.ScenariosProcessed ( ThisObject, , new Structure ( "Counter", Format ( LastScenario + 1, "NZ=; NG=" ) ) );
+	
+EndProcedure 
+
+&AtClient
+Procedure ScenariosProcessed ( Params ) export
+	
+	broadcastChanges ();
+	Close ( true );
+	
+EndProcedure 
+
+&AtClient
+Procedure ReadingComplete ( Document ) export
+	
+	FilesContent [ CurrentFile.Extension ] = Document.GetText ();
+	loadFiles ();
+	
+EndProcedure 
+
+&AtServerNoContext
+Function updateScenario ( val Application, val IsCommon, val Parent, val Path, val Content, val Type, val Remove, val UTC, val SourceFile )
+	
+	targetApplication = ? ( IsCommon, Catalogs.Applications.EmptyRef (), Application );
+	scenario = getScenario ( Path, targetApplication );
+	wasDeleted = ? ( scenario = undefined, false, DF.Pick ( scenario, "DeletionMark" ) );
+	if ( Remove ) then
+		if ( scenario <> undefined
+			and not wasDeleted ) then
+			deleteScenario ( scenario );
+		endif; 
+		return undefined;
+	endif;
+	isNew = scenario = undefined;
+	if ( isNew ) then
+		obj = Catalogs.Scenarios.CreateItem ();
+		loadFields ( obj, Path, Parent );
+	else
+		if ( Catalogs.Scenarios.Locked ( scenario ) ) then
+			raise Output.LoadingError ();
+		endif;
+		Catalogs.Versions.Create ( scenario, Output.LoadingProcessVersionMemo () );
+		obj = scenario.GetObject ();
+		obj.DeletionMark = false;
+	endif;
+	obj.Application = targetApplication;
+	obj.Type = Type;
+	if ( not IsCommon ) then
+		loadProperties ( obj, Content, SourceFile + RepositoryFiles.JSONFile () );
+		loadScript ( obj, Content );
+		loadTemplate ( obj, Content );
+	endif;
+	Catalogs.Scenarios.SetSorting ( obj );
+	Catalogs.Scenarios.UpdateFiles ( obj );
+	obj.DataExchange.Load = true;
+	if ( not Catalogs.Scenarios.CheckDoubles ( obj ) ) then
+		raise Output.LoadingError ();
+	endif;
+	obj.Changed = UTC;
+	obj.Write ();
+	obj.FullExchange ();
+	ref = obj.Ref;
+	ExchangePlans.Repositories.Sync ( ref, targetApplication, true );
+	if ( isNew ) then
+		InformationRegisters.Editing.Lock ( SessionParameters.User, ref );
+	endif;
+	return ref;
+	
+EndFunction
+
+&AtServerNoContext
+Function getScenario ( Path, Application )
+	
+	s = "
+	|select top 1 Scenarios.Ref as Ref
+	|from Catalog.Scenarios as Scenarios
+	|where Scenarios.Path = &Path
+	|and Scenarios.Application = &Application
+	|";
+	q = new Query ( s );
+	q.SetParameter ( "Path", Path );
+	q.SetParameter ( "Application", Application );
+	table = q.Execute ().Unload ();
+	return ? ( table.Count () = 0, undefined, table [ 0 ].Ref );
+	
+EndFunction
+
+&AtServerNoContext
+Procedure deleteScenario ( Scenario )
+	
+	if ( Catalogs.Scenarios.Locked ( Scenario ) ) then
+		raise Output.LoadingError ();
+	endif;
+	obj = Scenario.GetObject ();
+	obj.DataExchange.Load = true;
+	obj.DeletionMark = true;
+	obj.Write ();
+	obj.FullExchange ();
+	application = obj.Application;
+	ExchangePlans.Repositories.Sync ( Scenario, application, true );
+	if ( not obj.Tree ) then
+		return;
+	endif;
+	if ( application.IsEmpty () ) then
+		for each reference in Catalogs.Scenarios.ApplicationsInside ( Scenario, application ) do
+			alreadyHappened = reference = application;
+			ExchangePlans.Repositories.Sync ( Scenario, reference, alreadyHappened );
+			Catalogs.Scenarios.RemoveFile ( Scenario, reference, undefined, true, alreadyHappened );
+		enddo;
+	endif;
+	if ( not Catalogs.Scenarios.DeleteChildren ( Scenario, application ) ) then
+		Output.LoadingError ();
+	endif;
+
+EndProcedure
+
+&AtServerNoContext
+Procedure loadFields ( Obj, Path, Parent )
+	
+	Obj.SetNewCode ();
+	Obj.Creator = SessionParameters.User;
+	Obj.Path = Path;
+	parts = StrSplit ( Path, "." );
+	level = parts.UBound ();
+	Obj.Description = parts [ level ];
+	Obj.Parent = Parent;
+	
+EndProcedure 
+
+&AtServerNoContext
+Procedure loadProperties ( Scenario, Content, File )
+	
+	s = Content [ RepositoryFiles.JSONFile () ];
+	if ( s = undefined ) then
+		return;
+	endif;
+	try
+		DataProcessors.Load.Properties ( s, Scenario );
+	except
+		raise Output.ScenarioPropertiesLoadingError ( new Structure ( "File, Error", File, ErrorDescription () ) );
+	endtry;
+
+EndProcedure 
+
+&AtServerNoContext
+Procedure loadScript ( Scenario, Content )
+	
+	Scenario.Script = Content [ RepositoryFiles.BSLFile () ];
+
+EndProcedure 
+
+&AtServerNoContext
+Procedure loadTemplate ( Scenario, Content )
+	
+	address = Content [ RepositoryFiles.MXLFile () ];
+	if ( address = undefined ) then
+		DataProcessors.Load.ResetTemplate ( Scenario );
+	else
+		DataProcessors.Load.AssembleTemplate ( address, Scenario );
+	endif; 
+
+EndProcedure 
+
+// *****************************************
+// *********** Group Tree
+
+&AtClient
+Procedure MarkAll ( Command )
+	
+	checkbox ( ChangesTree.GetItems (), true );
+	
+EndProcedure
+
+&AtClient
+Procedure checkbox ( Rows, Value )
+	
+	for each row in Rows do
+		if ( row.Usage ) then
+			row.Use = Value;
+		endif; 
+		next = row.GetItems ();
+		if ( next.Count () > 0 ) then
+			checkbox ( next, Value );
+		endif; 
+	enddo; 
+	
+EndProcedure 
+
+&AtClient
+Procedure UnmarkAll ( Command )
+	
+	checkbox ( ChangesTree.GetItems (), false );
+	
+EndProcedure
+
+&AtClient
+Procedure ChangesTreeBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
+	
+	Cancel = true;
+	
+EndProcedure
+
+&AtClient
+Procedure ChangesTreeBeforeDeleteRow ( Item, Cancel )
+	
+	Cancel = true;
+	
+EndProcedure
+
+#endif
