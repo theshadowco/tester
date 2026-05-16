@@ -327,15 +327,11 @@ Extender::getIndex ( std::map<std::wstring, int> &SetEn, std::map<std::wstring, 
 
 void Extender::returnString ( tVariant *Result, const std::wstring &String ) const {
 	auto count = String.size ();
-	auto size = ( count + 1 ) * sizeof std::wstring::value_type ();
+	auto size = ( count + 1 ) * sizeof ( WCHAR_T );
 	if ( !size || !memoryManager->AllocMemory ( reinterpret_cast<void **>( &Result->pwstrVal ), size ) ) {
 		return;
 	}
-	#ifdef __linux__
 	Chars::ToWCHAR ( &Result->pwstrVal, String.data () );
-	#elif _WIN32
-	if ( wcscpy_s ( Result->pwstrVal, count + 1, String.c_str () ) ) return;
-	#endif
 	Result->vt = VTYPE_PWSTR;
 	Result->wstrLen = count;
 }

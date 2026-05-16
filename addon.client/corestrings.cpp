@@ -1,6 +1,7 @@
 #include "corestrings.h"
 #include <algorithm>
 #include <cstdint>
+#include <iterator>
 
 namespace strings {
 bool starts ( const std::wstring& source, std::wstring_view prefix ) {

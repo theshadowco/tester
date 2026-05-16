@@ -1,4 +1,5 @@
 #include "chars.h"
+#include <algorithm>
 #include <codecvt>
 #include <cstring>
 #include <locale>
@@ -64,7 +65,12 @@ std::string Chars::WideToString ( const std::wstring &Source ) {
 	try {
 		return utf16ToUtf8 ( temp );
 	} catch ( const std::range_error& ) {
-		return { temp.begin (), temp.end () };
+		std::string result;
+		result.reserve ( temp.size () );
+		for ( auto character : temp ) {
+			result.push_back ( static_cast<char> ( character ) );
+		}
+		return result;
 	}
 }
 
@@ -72,15 +78,7 @@ std::wstring Chars::WCHARToWide ( const WCHAR_T *String, size_t Length ) {
 	if ( String == nullptr ) {
 		return {};
 	}
-	#ifdef __linux__
 	return std::wstring { FromWCHAR ( String, Length ).get () };
-	#elif _WIN32
-	if ( Length ) {
-		return { String, Length };
-	} else {
-		return String;
-	}
-	#endif
 }
 
 // NOLINTEND(cppcoreguidelines-pro-type-const-cast)
