@@ -256,7 +256,7 @@ Procedure Меню ( Path ) export
 EndProcedure 
 
 &AtClient
-Function With ( Name = undefined, Activate = false ) export
+Function With ( Name = undefined, Activate = true ) export
 	
 	Test.CheckConnection ();
 	current = Forms.SetCurrent ( Name, Activate );
@@ -266,7 +266,7 @@ Function With ( Name = undefined, Activate = false ) export
 EndFunction
 
 &AtClient
-Function Здесь ( Name = undefined, Activate = false ) export
+Function Здесь ( Name = undefined, Activate = true ) export
 	
 	return With ( Name, Activate );
 

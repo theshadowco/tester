@@ -173,7 +173,8 @@ EndFunction
 
 Function SetCurrent ( Source, Activate ) export
 	
-	target = ? ( Source = undefined, App.GetActiveWindow ().Caption, Source );
+	activeWindow = App.GetActiveWindow ();
+	target = ? ( Source = undefined, activeWindow.Caption, Source );
 	if ( TypeOf ( target ) = Type ( "String" ) ) then
 		window = App.FindObject ( Type ( "TestedClientApplicationWindow" ), target );
 		if ( window = undefined ) then
@@ -182,14 +183,19 @@ Function SetCurrent ( Source, Activate ) export
 				raise Output.SourceNotFound ();
 			endif; 
 		else
-			CurrentSource = window.GetObject ();
+			if ( window.IsMain ) then
+				raise Output.SourceNotFound ();
+			else
+				CurrentSource = window.GetObject ();
+			endif;
 		endif; 
 	else
 		CurrentSource = target;
 	endif; 
 	ТекущийОбъект = CurrentSource;
 	if ( Activate
-		and TypeOf ( CurrentSource ) = Type ( "TestedForm" ) ) then
+		and TypeOf ( CurrentSource ) = Type ( "TestedForm" )
+		and activeWindow <> CurrentSource.GetParent () ) then
 		CurrentSource.Activate ();
 	endif; 
 	return CurrentSource;
