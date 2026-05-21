@@ -531,7 +531,7 @@ EndProcedure
 
 Procedure LogException ( val Subsystem, val Exception, val Level = undefined ) export
 	
-	logLevel = ? ( Level = undefined, EventLogLevel.Information, Level );
+	logLevel = ? ( Level = undefined, EventLogLevel.Information, EventLogLevel [ Level ] );
 	WriteLogEvent ( "ExternalMeta", logLevel, , , Exception );
 
 EndProcedure

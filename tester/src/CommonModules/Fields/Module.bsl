@@ -983,7 +983,7 @@ function getMetadata ( Form, Language )
 	try
 		data = ExternalMeta.GetTooltips ( path, Form, Language );
 	except
-		RuntimeSrv.LogException ( "ExternalMeta", ExternalMeta.Problem () );
+		RuntimeSrv.LogException ( "ExternalMeta", ExternalMeta.Problem (), "Warning" );
 		return undefined;
 	endtry;
 	return Conversion.FromJSON ( data );
