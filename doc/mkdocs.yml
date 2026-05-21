@@ -25,6 +25,7 @@ nav:
 - Хронограф: chrono.md
 - Разветвленная разработка, git: git.md
 - Visual Studio Code: vscode.md
+- AI-агенты и MCP: ai.md
 - Механизм заданий: jobs.md
 - Тестирование веб-клиента: webclient.md
 - Частые вопросы:
