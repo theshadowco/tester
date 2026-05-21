@@ -47,9 +47,15 @@ std::filesystem::path designerTooltipSources () {
 				 "designer";
 }
 
+std::filesystem::path cyrillicDesignerTooltipSources () {
+	return std::filesystem::path ( __FILE__ ).parent_path () /
+				 "cyrillic_designer";
+}
+
 nlohmann::json readTooltipsFrom ( const std::filesystem::path& sources,
-																	const std::string& formName ) {
-	Tooltips tips ( sources.string (), formName, "en" );
+																	const std::string& formName,
+																	const std::string& language = "en" ) {
+	Tooltips tips ( sources.string (), formName, language );
 	const auto body = tips.get ();
 	REQUIRE_FALSE ( body.empty () );
 	return nlohmann::json::parse ( body );
@@ -59,8 +65,9 @@ nlohmann::json readTooltips ( const std::string& formName ) {
 	return readTooltipsFrom ( tooltipSources (), formName );
 }
 
-nlohmann::json readDesignerTooltips ( const std::string& formName ) {
-	return readTooltipsFrom ( designerTooltipSources (), formName );
+nlohmann::json readDesignerTooltips ( const std::string& formName,
+																			const std::string& language = "en" ) {
+	return readTooltipsFrom ( designerTooltipSources (), formName, language );
 }
 
 void setStringVariant ( tVariant& Variant, const std::string& Value ) {
@@ -451,6 +458,22 @@ TEST_CASE ( "Read tooltips for a document form in designer format" ) {
 	CHECK_FALSE ( result.at ( "tables" ).contains ( "Items" ) );
 }
 
+TEST_CASE ( "Read tooltips for a Russian document form in designer format" ) {
+	const auto result = readTooltipsFrom (
+			cyrillicDesignerTooltipSources (),
+			"Документ.ПлатежноеПоручение.Форма.ФормаДокумента", "ru" );
+	CHECK ( result.at ( "explanation" ) ==
+					"Платежный документ для перечисления денег" );
+	CHECK ( result.at ( "fields" ).at ( "Номер" ).at ( "type" ) ==
+					"String(11)" );
+	CHECK ( result.at ( "fields" ).at ( "Организация" ).at ( "tooltip" ) ==
+					"Организация плательщика" );
+	CHECK ( result.at ( "fields" ).at ( "Организация" ).at ( "type" ) ==
+					"CatalogRef.Организации" );
+	CHECK ( result.at ( "fields" ).at ( "СуммаДокумента" ).at ( "type" ) ==
+					"Number(15,2)" );
+}
+
 TEST_CASE ( "Read tooltips for a catalog form in designer format" ) {
 	const auto result = readDesignerTooltips ( "Catalog.Items.Form.Form" );
 	CHECK ( result.at ( "explanation" ) ==
@@ -585,6 +608,14 @@ TEST_CASE ( "Metadata component exposes tooltips to 1C" ) {
 							.at ( "ItemsTable" )
 							.at ( "ItemsPrice" )
 							.at ( "type" ) == "Number(10,2)" );
+
+	const auto russian = nlohmann::json::parse (
+			callComponentMethod (
+					component, memoryManager, u"GetTooltips",
+					{ cyrillicDesignerTooltipSources ().string (),
+						"Документ.ПлатежноеПоручение.Форма.ФормаДокумента", "ru" } ) );
+	CHECK ( russian.at ( "fields" ).at ( "Организация" ).at ( "type" ) ==
+					"CatalogRef.Организации" );
 
 	CHECK ( DestroyObject ( &component ) == 0 );
 	CHECK ( component == nullptr );

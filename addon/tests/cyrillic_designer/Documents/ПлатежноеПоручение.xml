@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MetaDataObject xmlns="http://v8.1c.ru/8.3/MDClasses" xmlns:cfg="http://v8.1c.ru/8.1/data/enterprise/current-config" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:xr="http://v8.1c.ru/8.3/xcf/readable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<Document uuid="1cc042b5-ff65-4629-ae4b-c0bb288ab991">
+		<Properties>
+			<Name>ПлатежноеПоручение</Name>
+			<Synonym>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Платежное поручение</v8:content>
+				</v8:item>
+			</Synonym>
+			<NumberType>String</NumberType>
+			<NumberLength>11</NumberLength>
+			<Explanation>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Платежный документ для перечисления денег</v8:content>
+				</v8:item>
+			</Explanation>
+			<StandardAttributes/>
+		</Properties>
+		<ChildObjects>
+			<Attribute uuid="a7967afc-2183-486b-88ae-ed4a9f769f55">
+				<Properties>
+					<Name>Организация</Name>
+					<Type>
+						<v8:Type>cfg:CatalogRef.Организации</v8:Type>
+					</Type>
+					<ToolTip>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Организация плательщика</v8:content>
+						</v8:item>
+					</ToolTip>
+				</Properties>
+			</Attribute>
+			<Attribute uuid="24e11fd1-ddaf-4d03-bb2e-8eb3077fb99b">
+				<Properties>
+					<Name>СуммаДокумента</Name>
+					<Type>
+						<v8:Type>xs:decimal</v8:Type>
+						<v8:NumberQualifiers>
+							<v8:Digits>15</v8:Digits>
+							<v8:FractionDigits>2</v8:FractionDigits>
+						</v8:NumberQualifiers>
+					</Type>
+					<ToolTip>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Сумма платежа</v8:content>
+						</v8:item>
+					</ToolTip>
+				</Properties>
+			</Attribute>
+		</ChildObjects>
+	</Document>
+</MetaDataObject>

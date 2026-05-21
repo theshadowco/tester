@@ -48,15 +48,25 @@ struct ParsedPath {
 
 inline const std::unordered_map<std::string, MetadataFamily> FormKinds {
 		{ "Catalog", MetadataFamily::Catalog },
+		{ "Справочник", MetadataFamily::Catalog },
 		{ "ExchangePlan", MetadataFamily::ExchangePlan },
+		{ "ПланОбмена", MetadataFamily::ExchangePlan },
 		{ "Document", MetadataFamily::Document },
+		{ "Документ", MetadataFamily::Document },
 		{ "ChartOfAccounts", MetadataFamily::ChartOfAccounts },
+		{ "ПланСчетов", MetadataFamily::ChartOfAccounts },
 		{ "BusinessProcess", MetadataFamily::BusinessProcess },
+		{ "БизнесПроцесс", MetadataFamily::BusinessProcess },
 		{ "ChartOfCharacteristicTypes",
 			MetadataFamily::ChartOfCharacteristicTypes },
+		{ "ПланВидовХарактеристик",
+			MetadataFamily::ChartOfCharacteristicTypes },
 		{ "ChartOfCalculationTypes", MetadataFamily::ChartOfCalculationTypes },
+		{ "ПланВидовРасчета", MetadataFamily::ChartOfCalculationTypes },
 		{ "Task", MetadataFamily::Task },
+		{ "Задача", MetadataFamily::Task },
 		{ "InformationRegister", MetadataFamily::InformationRegister },
+		{ "РегистрСведений", MetadataFamily::InformationRegister },
 };
 
 inline const std::unordered_map<MetadataFamily, std::string> SourceFolders {
