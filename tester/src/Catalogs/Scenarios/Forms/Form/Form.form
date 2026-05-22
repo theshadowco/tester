@@ -7725,7 +7725,7 @@ from Catalog.Scenarios as Scenarios
     </edit>
   </attributes>
   <attributes>
-    <name>SimpleEditor</name>
+    <name>AdvancedEditor</name>
     <id>3</id>
     <valueType>
       <types>Boolean</types>

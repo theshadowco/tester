@@ -70,8 +70,8 @@ Function IsLinux () export
 EndFunction
 
 &AtServer
-Function SimpleEditor () export
+Function AdvancedEditor () export
 	
-	return Constants.SimpleEditor.Get ();
+	return Constants.AdvancedEditor.Get ();
 	
 EndFunction

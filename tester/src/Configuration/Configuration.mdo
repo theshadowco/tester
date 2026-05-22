@@ -310,6 +310,7 @@
   <commonCommands>CommonCommand.DownloadWorker</commonCommands>
   <commonCommands>CommonCommand.Help</commonCommands>
   <commonCommands>CommonCommand.Restart</commonCommands>
+  <constants>Constant.AdvancedEditor</constants>
   <constants>Constant.Agent</constants>
   <constants>Constant.ApplicationURL</constants>
   <constants>Constant.CloudPassword</constants>
@@ -325,7 +326,6 @@
   <constants>Constant.ServerAdministrator</constants>
   <constants>Constant.ServerCode</constants>
   <constants>Constant.ServerPassword</constants>
-  <constants>Constant.SimpleEditor</constants>
   <constants>Constant.SMTPPassword</constants>
   <constants>Constant.SMTPPort</constants>
   <constants>Constant.SMTPServer</constants>

@@ -50,7 +50,7 @@
       </extInfo>
     </items>
     <items xsi:type="form:FormField">
-      <name>SimpleEditor</name>
+      <name>AdvancedEditor</name>
       <id>164</id>
       <visible>true</visible>
       <enabled>true</enabled>
@@ -58,12 +58,12 @@
         <common>true</common>
       </userVisible>
       <dataPath xsi:type="form:DataPath">
-        <segments>ConstantsSet.SimpleEditor</segments>
+        <segments>ConstantsSet.AdvancedEditor</segments>
       </dataPath>
       <titleLocation>Top</titleLocation>
       <toolTipRepresentation>ShowBottom</toolTipRepresentation>
       <extendedTooltip>
-        <name>SimpleEditorExtendedTooltip</name>
+        <name>AdvancedEditorExtendedTooltip</name>
         <id>166</id>
         <type>Label</type>
         <autoMaxWidth>true</autoMaxWidth>
@@ -73,7 +73,7 @@
         </extInfo>
       </extendedTooltip>
       <contextMenu>
-        <name>SimpleEditorContextMenu</name>
+        <name>AdvancedEditorContextMenu</name>
         <id>165</id>
         <autoFill>true</autoFill>
       </contextMenu>

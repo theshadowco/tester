@@ -264,8 +264,8 @@ Procedure readAppearance ()
 	|ScenariosPanel hide HidePanel;
 	|SyncTree ActivateTree ScriptContextMenuSyncTree FindMain ScriptContextMenuFindMain ScriptContextMenuActivateDefinition enable not HidePanel;
 	|GroupHook show WebHook;
-	|Script show SimpleEditor;
-	|Editor show not SimpleEditor
+	|Script show not AdvancedEditor;
+	|Editor show AdvancedEditor
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
@@ -274,7 +274,7 @@ EndProcedure
 &AtServer
 Procedure initEditor ()
 	
-	SimpleEditor = Framework.SimpleEditor ();
+	AdvancedEditor = Framework.AdvancedEditor ();
 	TesterVersion = StrReplace ( Metadata.Version, ".", "_" );
 	EditorStorage = PutToTempStorage ( Catalogs.Scenarios.GetTemplate ( "Editor" ), UUID ); 
 	if ( EnvironmentSrv.WebClient () ) then
@@ -449,11 +449,11 @@ Procedure OnOpen(Cancel)
 	initProperties();
 	Appearance.Apply(ThisObject);
 	setTitle();
-	if ( SimpleEditor ) then
+	if ( AdvancedEditor ) then
+		deployEditor ();
+	else
 		syncScenario ();
 		AttachIdleHandler ( "activateEditor", 0.1, true );
-	else
-		deployEditor ();
 	endif;
 
 EndProcedure
@@ -565,7 +565,7 @@ EndProcedure
 &AtClient
 Function activateEditor() export
 
-	CurrentItem = ? ( SimpleEditor, Items.Script, Items.Editor );
+	CurrentItem = ? ( AdvancedEditor, Items.Editor, Items.Script );
 	return undefined;
 
 EndFunction
@@ -632,7 +632,7 @@ EndProcedure
 &AtClient
 Function isModified()
 
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		// Modified flag will not appear unless editor box looses focus
 		field = Items.Script;
 		if (CurrentItem = field) then
@@ -647,7 +647,7 @@ EndFunction
 &AtClient
 Procedure saveScenario ()
 	
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		Write ();
 	else
 		addToQueue ( "Write" );
@@ -660,7 +660,7 @@ Procedure reloadScenario ()
 
 	reload();
 	setTitle();
-	if ( not SimpleEditor ) then
+	if ( AdvancedEditor ) then
 		addToQueue ( "updateEditorAsync" );
 	endif;
 
@@ -689,7 +689,7 @@ EndProcedure
 Procedure unlockScenario ()
 	
 	unlock ();
-	if ( not SimpleEditor ) then
+	if ( AdvancedEditor ) then
 		addToQueue ( "updateEditorAsync" );
 	endif;
 	
@@ -710,7 +710,7 @@ EndProcedure
 Procedure activateRow(Line)
 
 	endOfLine = StrLen(StrGetLine(Object.Script, Line)) + 1;
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		Items.Script.SetTextSelectionBounds(Line, 1, Line, endOfLine);
 	else
 		addToQueue ( "activateRowAsync", new Structure ( "Line, EndOfLine", Line, endOfLine ) );
@@ -739,7 +739,7 @@ EndProcedure
 &AtClient
 Procedure applyAssistant(Replacement, Picking, Comment)
 
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		multiline = StrLineCount(Replacement) > 1;
 		if (multiline) then
 			getSelection();
@@ -816,7 +816,7 @@ EndProcedure
 Procedure BeforeWrite(Cancel, WriteParameters)
 
 	if (ScenarioForm.SaveParents(Object, OldParent)) then
-		if ( not SimpleEditor ) then
+		if ( AdvancedEditor ) then
 			uploadScript ();
 		endif;
 	else
@@ -906,7 +906,7 @@ Procedure AfterWrite(WriteParameters)
 	setTitle();
 	ScenariosPanel.Push(ThisObject);
 	RepositoryFiles.Sync();
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		resetCursor();
 	else
 		AttachIdleHandler ( "activateEditor", 0.1, true );
@@ -944,7 +944,7 @@ Procedure Reread() export
 
 	rereadMyself();
 	saveOldParent();
-	if ( not SimpleEditor ) then
+	if ( AdvancedEditor ) then
 		addToQueue ( "updateEditorAsync" );
 	endif;
 	setTitle();
@@ -974,7 +974,7 @@ EndProcedure
 &AtClient
 Procedure RunSelected(Command)
 
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		runCode();
 	else
 		addToQueue ( "runCodeAsync" );
@@ -995,7 +995,7 @@ EndProcedure
 &AtClient
 Procedure getSelection()
 
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		Items.Script.GetTextSelectionBounds(RowStart, ColumnStart, RowEnd, ColumnEnd);
 	else
 		info = engine ().getSelection ();
@@ -1044,7 +1044,7 @@ EndProcedure
 &AtClient
 Procedure commentScript()
 
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		getSelection();
 		insertComments();
 		restoreSelection();
@@ -1097,7 +1097,7 @@ EndFunction
 &AtClient
 Procedure Uncomment(Command)
 
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		uncommentScript();
 		activateEditor();
 	else
@@ -1266,7 +1266,7 @@ EndProcedure
 &AtClient
 Procedure SyncTree(Command)
 
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		synchronizeTree ();
 	else
 		addToQueue ( "synchronizeTree" );
@@ -1308,7 +1308,7 @@ EndProcedure
 &AtClient
 Procedure CheckSyntax(Command)
 
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		checkCode();
 		activateEditor();
 	else
@@ -1372,7 +1372,7 @@ EndProcedure
 &AtClient
 Procedure insertIdentifier()
 
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		Items.Script.SelectedText = TestingID ();
 	else
 		addToQueue ( "insertIdentifierAsync" );
@@ -1438,7 +1438,7 @@ Procedure Converting(Data, Params) export
 		return;
 	endif;
 	Log = Data.Log;
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		Items.Script.SelectedText = transpile(Data, Object.Script);
 	else
 		addToQueue ( "setRecorderScriptAsync", Data );
@@ -1485,7 +1485,7 @@ EndProcedure
 &AtClient
 Procedure FormatTable ( Command )
 	
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		alignTable ();
 	else
 		addToQueue ( "alignTableAsync" );
@@ -1500,7 +1500,7 @@ Procedure alignTable ()
 	evalRange = SelectionStart = SelectionEnd;
 	table = extractSelection ( evalRange );
 	text = TableProcessor.Formatting ( table.Text, table.Indent );
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		control = Items.Script;
 		if ( evalRange ) then
 			control.SetTextSelectionBounds ( table.Start, 1, table.Finish + 1, 1 );
@@ -1629,7 +1629,7 @@ EndFunction
 &AtClient
 Procedure AddBreakpoint(Command)
 
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		insertDebugger();
 	else
 		addToQueue ( "insertDebugger" );
@@ -1641,7 +1641,7 @@ EndProcedure
 Function insertDebugger()
 
 	label = Output.DebuggerLabel () + Chars.LF;
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		Items.Script.SelectedText = label;
 	else
 		engine ().selectedText ( label );
@@ -1885,7 +1885,7 @@ EndProcedure
 &AtClient
 Procedure OpenHere(Command)
 
-	if ( SimpleEditor ) then
+	if ( not AdvancedEditor ) then
 		applyScenario(TableRow.Ref);
 	else
 		addToQueue ( "applyScenarioAsync", TableRow.Ref );
@@ -1904,7 +1904,7 @@ Procedure applyScenario(Scenario)
 	endif;
 	ScenariosPanel.Pop(Object.Ref);
 	loadScenario(Scenario);
-	if ( not SimpleEditor ) then
+	if ( AdvancedEditor ) then
 		updateEditorAsync ();
 	endif;
 	ScenariosPanel.Push(ThisObject);

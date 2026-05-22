@@ -5,33 +5,33 @@
     <valueManagerType typeId="3dba0e5c-81cd-400d-9cd9-f4e253cae0a0" valueTypeId="fc6aac0d-9266-41af-a776-c553a4e8e922"/>
     <valueKeyType typeId="bcf4f825-1655-4af1-b189-95c9bda49171" valueTypeId="8db5a9fe-8249-48e8-9412-ca54b29cb508"/>
   </producedTypes>
-  <name>SimpleEditor</name>
+  <name>AdvancedEditor</name>
   <synonym>
     <key>en</key>
-    <value>Simple Editor</value>
+    <value>Advanced Editor</value>
   </synonym>
   <synonym>
     <key>ru</key>
-    <value>Простой редактор</value>
+    <value>Расширенный редактор</value>
   </synonym>
   <type>
     <types>Boolean</types>
   </type>
   <explanation>
     <key>en</key>
-    <value>Simple text editor, no syntax highlighting. Enable this mode if the advanced module text editor is not stable in your environment</value>
+    <value>Advanced text editor with syntax highlighting. Disable this mode if it is unstable in your environment</value>
   </explanation>
   <explanation>
     <key>ru</key>
-    <value>Простой текстовый редактор, без синтаксической подсветки. Включите этот режим, если расширенный текстовый редактор модулей работает не стабильно в вашем окружении</value>
+    <value>Расширенный текстовый редактор с синтаксической подсветкой. Отключите этот режим, если он работает нестабильно в вашем окружении</value>
   </explanation>
   <toolTip>
     <key>en</key>
-    <value>Simple text editor, no syntax highlighting. Enable this mode if the advanced module text editor is not stable in your environment</value>
+    <value>Advanced text editor with syntax highlighting. Disable this mode if it is unstable in your environment</value>
   </toolTip>
   <toolTip>
     <key>ru</key>
-    <value>Простой текстовый редактор, без синтаксической подсветки. Включите этот режим, если расширенный текстовый редактор модулей работает не стабильно в вашем окружении</value>
+    <value>Расширенный текстовый редактор с синтаксической подсветкой. Отключите этот режим, если он работает нестабильно в вашем окружении</value>
   </toolTip>
   <minValue xsi:type="core:UndefinedValue"/>
   <maxValue xsi:type="core:UndefinedValue"/>
