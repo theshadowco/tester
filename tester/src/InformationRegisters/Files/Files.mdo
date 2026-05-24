@@ -10,11 +10,6 @@
     <recordManagerType typeId="df5e66d7-393b-428e-838f-6962c9de27fe" valueTypeId="f0e07961-fc07-4293-9374-a3049b1ff61f"/>
   </producedTypes>
   <name>Files</name>
-  <synonym>
-    <key>en</key>
-    <value>Files</value>
-  </synonym>
-  <useStandardCommands>true</useStandardCommands>
   <editType>InDialog</editType>
   <dataLockControlMode>Managed</dataLockControlMode>
   <resources uuid="f732eeb6-70c3-49f6-bc57-4825d7408b9b">

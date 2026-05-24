@@ -18,7 +18,6 @@
     <key>ru</key>
     <value>Исходники</value>
   </synonym>
-  <useStandardCommands>true</useStandardCommands>
   <editType>InDialog</editType>
   <defaultRecordForm>InformationRegister.Sources.Form.Form</defaultRecordForm>
   <defaultListForm>InformationRegister.Sources.Form.List</defaultListForm>

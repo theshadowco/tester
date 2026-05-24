@@ -14,10 +14,6 @@
       </visible>
     </visibilityFragments>
     <visibilityFragments>
-      <command>InformationRegister.Sources.StandardCommand.OpenList</command>
-      <visible/>
-    </visibilityFragments>
-    <visibilityFragments>
       <command>Catalog.Users.StandardCommand.OpenList</command>
       <visible>
         <common>true</common>
@@ -88,7 +84,6 @@
       <commands>Document.Job.StandardCommand.OpenList</commands>
       <commands>Catalog.Applications.StandardCommand.OpenList</commands>
       <commands>Catalog.OnExit.StandardCommand.OpenList</commands>
-      <commands>InformationRegister.Sources.StandardCommand.OpenList</commands>
     </orderFragments>
     <orderFragments>
       <group>NavigationPanelSeeAlso</group>
