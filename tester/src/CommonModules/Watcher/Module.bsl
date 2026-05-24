@@ -131,8 +131,9 @@ Function FindApplication(File) export
 		return undefined;
 	endif;
 	for each item in FoldersWatchdog do
-		value = item.Value;
-		if (StrStartsWith(File, value.Folder)) then
+		path = StrReplace ( File, "\", "/" );
+		folder = StrReplace ( item.Value.Folder, "\", "/" );
+		if (StrStartsWith(path, folder)) then
 			return item;
 		endif;
 	enddo;

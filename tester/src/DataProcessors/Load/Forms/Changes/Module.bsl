@@ -484,7 +484,7 @@ Procedure loadFiles ()
 		BeginPutFile ( new NotifyDescription ( "PutMXL", ThisObject ), , file, false, UUID );
 	else
 		doc = new TextDocument ();
-		doc.BeginReading ( new NotifyDescription ( "ReadingComplete", ThisObject, doc ), file );
+		doc.BeginReading ( new NotifyDescription ( "ReadingComplete", ThisObject, doc ), file, TextEncoding.UTF8 );
 	endif; 
 	
 EndProcedure 

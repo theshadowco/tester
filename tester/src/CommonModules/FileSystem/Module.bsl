@@ -76,8 +76,10 @@ EndFunction
 
 Function GetFileName ( Path ) export
 
-	separator = GetPathSeparator ();
-	a = StrFind ( Path, separator, SearchDirection.FromEnd );
+	a = StrFind ( Path, "\", SearchDirection.FromEnd );
+	if ( a = 0 ) then
+		a = StrFind ( Path, "/", SearchDirection.FromEnd );
+	endif;
 	return ? ( a = 0, Path, Mid ( Path, a + 1 ) );
 	
 EndFunction
