@@ -2318,7 +2318,7 @@ EndFunction
 &AtClient
 Function SrenarioNotProvided () export
 
-	return "The tool arguments were not found. You should provide the full path to the bsl-file in the 'args.script_path' value. The file should be inside a Tester repository folder configured for the current session. For example: { ""id"": ""mcp_call_1"", ""name"": ""execute_script"", ""args"": { ""script_path"": ""/home/user/project/path/to/file.bsl"" } }";
+	return "The tool arguments were not found. You should provide the full path to the bsl-file in the 'args.script_path' value. The file should be inside a Tester repository folder configured for the current session. Path examples: /home/user/project/path/to/file.bsl for Linux, or C:\Users\user\project\path\to\file.bsl for Windows.";
 
 EndFunction
 
@@ -2484,4 +2484,3 @@ Function UnloadingFilesCheckFillingError () export
 	return NStr ( "en = 'CheckFilling() of data processor Unload returned an error. Please try to sync files manually'; ru = 'ПроверкаЗаполнения() обработчика данных Выгрузка вернул ошибку. Пожалуйста, попробуйте синхронизировать файлы вручную'" );
 
 EndFunction
-

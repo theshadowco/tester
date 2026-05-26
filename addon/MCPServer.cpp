@@ -449,15 +449,13 @@ nlohmann::json MCPServer::listToolsResult () const {
 									{ { "type", "string" },
 										{ "title", "BSL Script Path" },
 										{ "description",
-											"Absolute path to the .bsl script file to execute. "
-											"The file must already exist and use the .bsl "
-											"extension. Example: "
-											"/home/dmitry/agr.accounting/tester/example.bsl" },
-										{ "minLength", 1 },
-										{ "pattern", "^/.+\\.bsl$" },
-										{ "examples", nlohmann::json::array (
-																			{ "/home/dmitry/agr.accounting/tester/"
-																				"example.bsl" } ) } } } } },
+												"Absolute path to the .bsl script file to execute. "
+												"The file must already exist and use the .bsl "
+												"extension. Example: "
+												"/full/path/to/script.bsl" },
+											{ "minLength", 1 },
+											{ "examples", nlohmann::json::array (
+																				{ "/full/path/to/script.bsl" } ) } } } } },
 						{ "required", { "script_path" } },
 						{ "additionalProperties", false } } } } );
 	tools.push_back (
